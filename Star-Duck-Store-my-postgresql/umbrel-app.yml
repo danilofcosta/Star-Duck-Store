@@ -1,0 +1,40 @@
+manifestVersion: 1
+id: Star-Duck-Store-my-postgresql
+name: PostgreSQL + pgAdmin
+tagline: Banco de dados PostgreSQL com pgAdmin no seu Umbrel
+icon: https://raw.githubusercontent.com/danilofcosta/Star-Duck-Store/master/Star-Duck-Store-my-postgresql/base-de-dados.png
+category: Development
+version: "1.0.0"
+port: 5400
+description: >-
+  Banco de dados PostgreSQL para a Star Duck Store, com a interface web do
+  pgAdmin 4 para gerenciar bancos de dados, tabelas, usuários e consultas
+  (queries) diretamente pelo navegador.
+
+
+  Para começar, faça login no pgAdmin com o e-mail e a senha exibidos abaixo.
+  Em seguida, adicione um novo servidor usando o host `db`, usuário `postgres`
+  e a senha do banco de dados.
+
+
+  ---
+
+
+  Postgres ícones criados por [amoghdesign](https://www.flaticon.com/authors/amoghdesign) - [Flaticon](https://www.flaticon.com)
+
+developer: Danilo Costa
+website: https://github.com/danilofcosta
+submitter: Danilo Costa
+submission: https://github.com/danilofcosta/Star-Duck-Store
+repo: https://github.com/danilofcosta/Star-Duck-Store
+support: https://github.com/danilofcosta/Star-Duck-Store/issues
+gallery:
+  - https://raw.githubusercontent.com/danilofcosta/Star-Duck-Store/master/Star-Duck-Store-my-postgresql/gallery/screenshot.webp
+  - https://raw.githubusercontent.com/danilofcosta/Star-Duck-Store/master/Star-Duck-Store-my-postgresql/gallery/640px-pgadmin.png
+  - https://raw.githubusercontent.com/danilofcosta/Star-Duck-Store/master/Star-Duck-Store-my-postgresql/gallery/image-2_orig.webp
+releaseNotes: >-
+  Versão inicial do app com PostgreSQL 16 e pgAdmin 4.
+dependencies: []
+path: ""
+defaultUsername: "admin@admin.com"
+defaultPassword: "admin"
