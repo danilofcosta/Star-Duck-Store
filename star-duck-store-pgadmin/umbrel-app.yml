@@ -1,6 +1,6 @@
 manifestVersion: 1
 id: star-duck-store-my-postgresql
-name: PostgreSQL + pgAdmin
+name: pgAdmin
 tagline: Banco de dados PostgreSQL com pgAdmin no seu Umbrel
 icon: https://raw.githubusercontent.com/danilofcosta/Star-Duck-Store/master/star-duck-store-my-postgresql/base-de-dados.png
 category: Development
