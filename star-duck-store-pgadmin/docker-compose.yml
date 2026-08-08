@@ -1,7 +1,7 @@
 services:
   app_proxy:
     environment:
-      APP_HOST: star-duck-store-my-postgresql_web_1
+      APP_HOST: star-duck-store-pgadmin_web_1
       APP_PORT: 80
 
   db:
