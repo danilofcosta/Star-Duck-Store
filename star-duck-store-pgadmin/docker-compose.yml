@@ -8,7 +8,7 @@ services:
     image: postgres:18-alpine
     restart: on-failure
     ports:
-      - "5432:5432"
+      - "5433:5432"
     environment:
       POSTGRES_DB: app
       POSTGRES_USER: postgres
@@ -24,8 +24,6 @@ services:
   web:
     image: dpage/pgadmin4:8
     restart: on-failure
-    ports:
-      - "8080:80"
     environment:
       PGADMIN_DEFAULT_EMAIL: admin@admin.com
       PGADMIN_DEFAULT_PASSWORD: admin
