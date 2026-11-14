@@ -4,7 +4,7 @@ name: Gerbera DLNA
 tagline: Servidor DLNA/UPnP para transmitir filmes, músicas e fotos para Smart TVs
 icon: https://raw.githubusercontent.com/danilofcosta/Star-Duck-Store/master/star-duck-store-gerbera/logo.png
 category: Media
-version: "2.4.1"
+version: "3.3.0"
 port: 49494
 description: >-
   Gerbera é um servidor de mídia UPnP/DLNA moderno e de alta performance que

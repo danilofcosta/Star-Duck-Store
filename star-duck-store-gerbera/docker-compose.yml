@@ -1,8 +1,6 @@
-version: "3.7"
-
 services:
   server:
-    image: gerbera/gerbera:v2.4.1
+    image: gerbera/gerbera:3.3.0
     restart: on-failure
     network_mode: host
     environment:
