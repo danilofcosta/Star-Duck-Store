@@ -1,36 +1,56 @@
 manifestVersion: 1
 id: star-duck-store-gerbera
 name: Gerbera DLNA
-tagline: Servidor DLNA/UPnP para transmitir filmes, músicas e fotos para Smart TVs
+tagline: Servidor UPnP/DLNA com interface web para Smart TVs e players de mídia
 icon: https://raw.githubusercontent.com/danilofcosta/Star-Duck-Store/master/star-duck-store-gerbera/logo.png
 category: Media
-version: "3.3.0"
-port: 50500
+version: "3.2.0-1"
+port: 8250
 description: >-
-  Gerbera é um servidor de mídia UPnP/DLNA moderno e de alta performance que
-  permite transmitir seus vídeos, músicas e fotos armazenados no Umbrel diretamente
-  para Smart TVs, consoles (PlayStation/Xbox), receivers e players DLNA da sua rede local.
+  Gerbera é um servidor de mídia UPnP/DLNA moderno e completo que permite transmitir
+  seus vídeos, músicas e fotos armazenados no Umbrel diretamente para Smart TVs,
+  consoles (PlayStation/Xbox), receivers e players DLNA da sua rede local.
 
 
-  Diferente de outros servidores que rodam isolados em bridges virtuais, este app
-  utiliza modo de rede host (`network_mode: host`) para permitir que o protocolo SSDP
-  (multicast UDP 1900) responda nativamente e instantaneamente nas TVs da sua casa.
+  Destaques:
 
 
-  Suas mídias podem ser colocadas diretamente na pasta da aplicação (`${APP_DATA_DIR}/data/media`)
-  ou acessadas da pasta de downloads padrão do Umbrel (`/mnt/umbrel-downloads`).
+  - Interface web integrada para configuração e monitoramento fácil
+  - Suporte a ampla gama de formatos (áudio, vídeo, imagens)
+  - Extração automática de metadados e transcodificação em tempo real
+  - Múltiplas bibliotecas com organização flexível
+  - Importação de diretórios, playlists e fontes online
+  - API REST para integrações externas
+  - Compatível com todas as arquiteturas do Umbrel (amd64, arm64)
 
+
+  Após a instalação, abra a interface web do Gerbera para adicionar suas pastas
+  de mídia e configurar o servidor. A pasta padrão é /media/downloads
+  que mapeia para a pasta Downloads do Umbrel.
 developer: Gerbera Team
 website: https://gerbera.io
-submitter: Danilo Costa
-submission: https://github.com/danilofcosta/Star-Duck-Store
 repo: https://github.com/gerbera/gerbera
 support: https://github.com/gerbera/gerbera/issues
 gallery:
   - https://raw.githubusercontent.com/danilofcosta/Star-Duck-Store/master/star-duck-store-gerbera/gallery/1.png
+dependencies: []
+permissions:
+  - STORAGE_DOWNLOADS
 path: ""
 defaultUsername: ""
 defaultPassword: ""
-torOnly: false
-permissions:
-  - STORAGE_DOWNLOADS
+releaseNotes: >-
+  Atualização de empacotamento para Gerbera 3.2.0 (revisão 1).
+
+  Mudanças nesta revisão:
+  - Migração de network_mode: host para app_proxy nativo do Umbrel
+  - Integração com autenticação Umbrel, HTTPS automático e rede isolada
+  - Estrutura de persistência corrigida (config em /var/run/gerbera)
+  - Adicionado exports.sh com IP estático e caminhos de dados
+  - FolderAccess para Downloads e Media Library personalizada via UI do Umbrel
+  - Imagem multi-arch com digest SHA256 fixo (amd64 + arm64)
+
+  Nota: Se a descoberta DLNA (SSDP) não funcionar na sua TV/player,
+  pode ser necessário usar network_mode: host (veja documentação).
+submitter: Danilo Costa
+submission: https://github.com/danilofcosta/Star-Duck-Store
