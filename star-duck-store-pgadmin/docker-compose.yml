@@ -1,11 +1,15 @@
+version: "3.7"
+
 services:
   app_proxy:
     environment:
-      APP_HOST: star-duck-store-pgadmin_web_1
+      APP_HOST: pgadmin
       APP_PORT: 80
+      PROXY_AUTH_ADD: "false"
 
   db:
     image: postgres:18-alpine
+    container_name: pgadmin-db
     restart: on-failure
     ports:
       - "5433:5432"
@@ -20,13 +24,19 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+      start_period: 10s
 
-  web:
+  pgadmin:
     image: dpage/pgadmin4:8
+    container_name: pgadmin
     restart: on-failure
     environment:
       PGADMIN_DEFAULT_EMAIL: admin@admin.com
       PGADMIN_DEFAULT_PASSWORD: admin
+      PGADMIN_CONFIG_SERVER_MODE: "False"
+      PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: "False"
     depends_on:
       db:
         condition: service_healthy
+    volumes:
+      - ${APP_DATA_DIR}/pgadmin:/var/lib/pgadmin

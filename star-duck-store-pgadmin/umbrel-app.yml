@@ -4,7 +4,7 @@ name: pgAdmin
 tagline: Banco de dados PostgreSQL com pgAdmin no seu Umbrel
 icon: https://raw.githubusercontent.com/danilofcosta/Star-Duck-Store/master/star-duck-store-pgadmin/base-de-dados.png
 category: Development
-version: "1.0.0"
+version: "1.0.1"
 port: 5400
 description: >-
   Banco de dados PostgreSQL para a Star Duck Store, com a interface web do
@@ -24,7 +24,7 @@ description: >-
 
 developer: Danilo Costa
 website: https://github.com/danilofcosta
-submitter: Danilo Costa
+submitter: Star Duck Store
 submission: https://github.com/danilofcosta/Star-Duck-Store
 repo: https://github.com/danilofcosta/Star-Duck-Store
 support: https://github.com/danilofcosta/Star-Duck-Store/issues
@@ -33,9 +33,17 @@ gallery:
   - https://raw.githubusercontent.com/danilofcosta/Star-Duck-Store/master/star-duck-store-pgadmin/gallery/640px-pgadmin.png
   - https://raw.githubusercontent.com/danilofcosta/Star-Duck-Store/master/star-duck-store-pgadmin/gallery/image-2_orig.webp
 releaseNotes: >-
-  Versão inicial do app com PostgreSQL 18 e pgAdmin 4. O banco fica disponível
-  no host na porta 5433 (a 5432 é usada internamente pelo umbrelOS).
+  Versão 1.0.1: Correção de estrutura para compatibilidade com Umbrel App Store
+  - Adicionado exports.sh obrigatório
+  - Docker Compose atualizado para v3.7 com healthchecks
+  - Banco PostgreSQL na porta 5433
 dependencies: []
 path: ""
 defaultUsername: "admin@admin.com"
 defaultPassword: "admin"
+initScript: |
+  # Create data directories
+  mkdir -p "${APP_DATA_DIR}/postgres"
+  mkdir -p "${APP_DATA_DIR}/pgadmin"
+  chown -R 1000:1000 "${APP_DATA_DIR}/postgres"
+  chown -R 5050:5050 "${APP_DATA_DIR}/pgadmin"
