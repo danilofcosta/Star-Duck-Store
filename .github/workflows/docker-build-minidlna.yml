@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
     paths:
-      - 'star-duck-store-gerbera/**'
+      - 'star-duck-store-minidlna/**'
       - '.github/workflows/docker-build-minidlna.yml'
   workflow_dispatch:
     inputs:
@@ -62,8 +62,8 @@ jobs:
       - name: Build and push multi-arch image
         uses: docker/build-push-action@v5
         with:
-          context: ./star-duck-store-gerbera
-          file: ./star-duck-store-gerbera/Dockerfile
+          context: ./star-duck-store-minidlna
+          file: ./star-duck-store-minidlna/Dockerfile
           platforms: linux/amd64,linux/arm64
           push: true
           tags: ${{ steps.meta.outputs.tags }}

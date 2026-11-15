@@ -1,0 +1,112 @@
+manifestVersion: 1
+id: star-duck-store-minidlna
+name: MiniDLNA Server
+tagline: Servidor UPnP/DLNA leve com interface web para gerenciar pastas e status
+icon: https://raw.githubusercontent.com/danilofcosta/Star-Duck-Store/master/star-duck-store-minidlna/logo.png
+category: Media
+version: "1.3.3-1"
+port: 8250
+description: >-
+  MiniDLNA (ReadyMedia) é um servidor UPnP/DLNA leve, rápido e confiável para transmitir
+  seus vídeos, músicas e fotos para Smart TVs, consoles (PlayStation/Xbox), receivers
+  e players DLNA na rede local.
+
+  ✨ Destaques:
+  - Descoberta DLNA/SSDP nativa e confiável (roda em network_mode: host)
+  - Interface web integrada para status, gerenciamento de pastas e controle do serviço
+  - Suporte a inotify: detecta novos arquivos automaticamente
+  - Multi-arquitetura: amd64 (PC/servidor) e arm64 (Raspberry Pi 4/5)
+  - Configuração persistente: sobrevive a atualizações e reinstalações
+  - Acesso às pastas do Umbrel: Downloads + bibliotecas customizadas em /media
+
+  📁 Pastas de mídia padrão:
+  - /media → Suas pastas customizadas (adicione via File Browser ou terminal)
+  - /media/downloads → Pasta Downloads do Umbrel
+
+  🌐 Interface Web (porta 8250):
+  - Status em tempo real: arquivos indexados, clientes conectados, versão
+  - Adicionar/remover pastas compartilhadas com tipo (Áudio/Vídeo/Imagens/Mista)
+  - Botão "Reescanear Mídia" e "Reiniciar MiniDLNA"
+  - Visualização do minidlna.conf atual
+
+  ⚙️ Para adicionar pastas: use a interface web ou edite /config/minidlna.conf via terminal/File Browser.
+
+developer: MiniDLNA Team
+website: https://sourceforge.net/projects/minidlna/
+repo: https://github.com/minidlna/minidlna
+submitter: Star Duck Store
+submission: https://github.com/danilofcosta/Star-Duck-Store
+support: https://github.com/danilofcosta/Star-Duck-Store/issues
+gallery:
+  - https://raw.githubusercontent.com/danilofcosta/Star-Duck-Store/master/star-duck-store-minidlna/gallery/1.png
+keywords:
+  - dlna
+  - upnp
+  - media-server
+  - minidlna
+  - readymedia
+  - smart-tv
+  - streaming
+permissions:
+  - network
+  - storage
+folderAccess:
+  - /data/storage/downloads
+initScript: |
+  # Create default minidlna.conf if not exists
+  CONFIG_FILE="${APP_DATA_DIR}/data/minidlna/minidlna.conf"
+  if [ ! -f "$CONFIG_FILE" ]; then
+    mkdir -p "$(dirname "$CONFIG_FILE")"
+    cat > "$CONFIG_FILE" <<'EOF'
+# MiniDLNA Configuration for Umbrel
+# Generated automatically - edit via Web UI or manually
+
+# Network interface (empty = all)
+network_interface=
+
+# Port for HTTP (descriptions, SOAP, media transfer)
+port=8200
+
+# Friendly name shown to clients
+friendly_name=Umbrel DLNA
+
+# Database and log directories
+db_dir=/config/cache
+log_dir=/config/log
+
+# Media directories (A=Audio, V=Video, P=Images, none=All)
+media_dir=/media
+media_dir=/media/downloads
+
+# Inotify monitoring (auto-detect new files)
+inotify=yes
+
+# Strict DLNA compliance
+strict_dlna=no
+
+# TiVo support
+tivo_support=no
+
+# Album art names
+album_art_names=Cover.jpg/cover.jpg/AlbumArtSmall.jpg/albumartsmall.jpg/AlbumArt.jpg/albumart.jpg/Album.jpg/album.jpg/Folder.jpg/folder.jpg/Thumb.jpg/thumb.jpg
+
+# Notification interval (seconds)
+notify_interval=30
+
+# Serial and model (for client identification)
+serial=12345678
+model_number=1
+
+# Root container (.) = all types
+root_container=.
+EOF
+    chown -R 1000:1000 "${APP_DATA_DIR}/data/minidlna"
+  fi
+
+  # Ensure media directory exists
+  mkdir -p "${APP_DATA_DIR}/data/media"
+  chown -R 1000:1000 "${APP_DATA_DIR}/data/media"
+
+  # Create PID and log directories
+  mkdir -p "${APP_DATA_DIR}/data/minidlna"
+  chown -R 1000:1000 "${APP_DATA_DIR}/data/minidlna"
