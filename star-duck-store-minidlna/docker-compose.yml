@@ -3,7 +3,7 @@ version: "3.7"
 services:
   app_proxy:
     environment:
-      APP_HOST: minidlna
+      APP_HOST: localhost
       APP_PORT: 8250
       PROXY_AUTH_ADD: "false"
 
