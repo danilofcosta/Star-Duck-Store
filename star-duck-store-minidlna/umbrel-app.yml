@@ -53,60 +53,8 @@ permissions:
 folderAccess:
   - /data/storage/downloads
 initScript: |
-  # Create default minidlna.conf if not exists
-  CONFIG_FILE="${APP_DATA_DIR}/data/minidlna/minidlna.conf"
-  if [ ! -f "$CONFIG_FILE" ]; then
-    mkdir -p "$(dirname "$CONFIG_FILE")"
-    cat > "$CONFIG_FILE" <<'EOF'
-# MiniDLNA Configuration for Umbrel
-# Generated automatically - edit via Web UI or manually
-
-# Network interface (empty = all)
-network_interface=
-
-# Port for HTTP (descriptions, SOAP, media transfer)
-port=8200
-
-# Friendly name shown to clients
-friendly_name=Umbrel DLNA
-
-# Database and log directories
-db_dir=/config/cache
-log_dir=/config/log
-
-# Media directories (A=Audio, V=Video, P=Images, none=All)
-media_dir=/media
-media_dir=/media/downloads
-
-# Inotify monitoring (auto-detect new files)
-inotify=yes
-
-# Strict DLNA compliance
-strict_dlna=no
-
-# TiVo support
-tivo_support=no
-
-# Album art names
-album_art_names=Cover.jpg/cover.jpg/AlbumArtSmall.jpg/albumartsmall.jpg/AlbumArt.jpg/albumart.jpg/Album.jpg/album.jpg/Folder.jpg/folder.jpg/Thumb.jpg/thumb.jpg
-
-# Notification interval (seconds)
-notify_interval=30
-
-# Serial and model (for client identification)
-serial=12345678
-model_number=1
-
-# Root container (.) = all types
-root_container=.
-EOF
-    chown -R 1000:1000 "${APP_DATA_DIR}/data/minidlna"
-  fi
-
-  # Ensure media directory exists
-  mkdir -p "${APP_DATA_DIR}/data/media"
-  chown -R 1000:1000 "${APP_DATA_DIR}/data/media"
-
-  # Create PID and log directories
+  # Create data directories (config is created by container entrypoint from template)
   mkdir -p "${APP_DATA_DIR}/data/minidlna"
+  mkdir -p "${APP_DATA_DIR}/data/media"
   chown -R 1000:1000 "${APP_DATA_DIR}/data/minidlna"
+  chown -R 1000:1000 "${APP_DATA_DIR}/data/media"
