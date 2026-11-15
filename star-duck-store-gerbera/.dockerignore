@@ -1,0 +1,27 @@
+# Git
+.git
+.gitignore
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+
+# Logs
+*.log
+logs/
+
+# Build
+docker-compose.override.yml
+*.tar
+
+# Test
+.coverage
+.pytest_cache
+__pycache__/
+*.pyc

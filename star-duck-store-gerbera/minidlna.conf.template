@@ -1,0 +1,55 @@
+# MiniDLNA Configuration for Umbrel
+# Generated automatically - edit via Web UI or manually
+# This file is managed by the Web UI - changes via UI will overwrite this file
+
+# Network interface (empty = all)
+network_interface=
+
+# Port for HTTP (descriptions, SOAP, media transfer)
+port=8200
+
+# Friendly name shown to clients
+friendly_name=Umbrel DLNA
+
+# Database and log directories
+db_dir=/config/cache
+log_dir=/config/log
+
+# Media directories (A=Audio, V=Video, P=Images, none=All)
+# Format: media_dir=<type>,<path>  (type: A,V,P or empty for all)
+media_dir=/media
+media_dir=/media/downloads
+
+# Inotify monitoring (auto-detect new files)
+inotify=yes
+
+# Strict DLNA compliance
+strict_dlna=no
+
+# TiVo support
+tivo_support=no
+
+# Album art names
+album_art_names=Cover.jpg/cover.jpg/AlbumArtSmall.jpg/albumartsmall.jpg/AlbumArt.jpg/albumart.jpg/Album.jpg/album.jpg/Folder.jpg/folder.jpg/Thumb.jpg/thumb.jpg
+
+# Notification interval (seconds)
+notify_interval=30
+
+# Serial and model (for client identification)
+serial=12345678
+model_number=1
+
+# Root container (.) = all types
+root_container=.
+
+# Additional options
+# minidlna.conf supports many more options - see man minidlna.conf
+# Common ones:
+# wide_links=yes
+# enable_tivo=no
+# strict_dlna=no
+# album_art_names=...
+# notify_interval=30
+# serial=12345678
+# model_number=1
+# root_container=.

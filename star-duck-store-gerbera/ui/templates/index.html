@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MiniDLNA - Umbrel DLNA Server</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; min-height: 100vh; }
+        .container { max-width: 900px; margin: 0 auto; padding: 20px; }
+        header { background: #1a73e8; color: white; padding: 24px; border-radius: 12px 12px 0 0; }
+        header h1 { font-size: 1.75rem; font-weight: 600; }
+        header p { opacity: 0.9; margin-top: 4px; }
+        .card { background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 20px; overflow: hidden; }
+        .card-header { padding: 16px 20px; border-bottom: 1px solid #eee; font-weight: 600; font-size: 1.1rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+        .card-body { padding: 20px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; }
+        .stat { text-align: center; padding: 16px; background: #f8f9fa; border-radius: 8px; }
+        .stat-value { font-size: 2rem; font-weight: 700; color: #1a73e8; }
+        .stat-label { font-size: 0.875rem; color: #666; margin-top: 4px; }
+        .folder-list { list-style: none; }
+        .folder-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; border-bottom: 1px solid #eee; gap: 12px; flex-wrap: wrap; }
+        .folder-item:last-child { border-bottom: none; }
+        .folder-path { font-family: monospace; font-size: 0.9rem; color: #333; word-break: break-all; flex: 1; min-width: 200px; }
+        .folder-type { font-size: 0.75rem; background: #e8f0fe; color: #1a73e8; padding: 2px 8px; border-radius: 4px; white-space: nowrap; }
+        .btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; border: none; border-radius: 8px; font-size: 0.9rem; font-weight: 500; cursor: pointer; transition: all 0.2s; }
+        .btn-primary { background: #1a73e8; color: white; }
+        .btn-primary:hover { background: #1557b0; }
+        .btn-secondary { background: #f1f3f4; color: #333; }
+        .btn-secondary:hover { background: #e8eaed; }
+        .btn-danger { background: #fce8e6; color: #c5221f; }
+        .btn-danger:hover { background: #fad2cf; }
+        .btn-success { background: #e6f4ea; color: #137333; }
+        .btn-success:hover { background: #d1eed8; }
+        .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+        .status-badge { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 500; }
+        .status-online { background: #e6f4ea; color: #137333; }
+        .status-offline { background: #fce8e6; color: #c5221f; }
+        .status-dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+        .dlna-url { font-family: monospace; background: #f1f3f4; padding: 8px 12px; border-radius: 6px; font-size: 0.85rem; color: #333; word-break: break-all; }
+        .section { margin-bottom: 24px; }
+        .section-title { font-size: 1rem; font-weight: 600; margin-bottom: 12px; color: #333; }
+        .actions { display: flex; gap: 12px; flex-wrap: wrap; }
+        .loading { display: flex; align-items: center; justify-content: center; padding: 40px; color: #666; }
+        .spinner { width: 24px; height: 24px; border: 3px solid #e8f0fe; border-top-color: #1a73e8; border-radius: 50%; animation: spin 1s linear infinite; margin-right: 12px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .toast { position: fixed; bottom: 20px; right: 20px; padding: 12px 20px; border-radius: 8px; color: white; font-weight: 500; z-index: 1000; animation: slideIn 0.3s; }
+        .toast.success { background: #137333; }
+        .toast.error { background: #c5221f; }
+        .toast.warning { background: #f9ab00; color: #333; }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .hidden { display: none !important; }
+        .form-row { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; align-items: flex-end; }
+        .form-group { flex: 1; min-width: 200px; }
+        .form-group label { display: block; font-size: 0.85rem; font-weight: 500; margin-bottom: 6px; color: #333; }
+        .form-group select, .form-group input { width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 0.9rem; background: white; }
+        .form-group input:focus, .form-group select:focus { outline: none; border-color: #1a73e8; box-shadow: 0 0 0 3px rgba(26,115,232,0.15); }
+        .hint { font-size: 0.8rem; color: #666; margin-top: 8px; }
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.4); display: none; align-items: center; justify-content: center; z-index: 100; padding: 20px; }
+        .modal-overlay.show { display: flex; }
+        .modal { background: white; border-radius: 12px; padding: 24px; width: 100%; max-width: 480px; box-shadow: 0 8px 32px rgba(0,0,0,0.15); }
+        .modal h3 { margin-bottom: 16px; font-size: 1.1rem; }
+        .modal-actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📺 MiniDLNA Server</h1>
+            <p>Servidor UPnP/DLNA para Smart TVs, Consoles e Players de Mídia</p>
+        </header>
+
+        <div id="toast-container"></div>
+
+        <!-- Status & Control Card -->
+        <div class="card">
+            <div class="card-header">
+                Status do Servidor
+                <span id="status-badge" class="status-badge status-offline">
+                    <span class="status-dot"></span>
+                    <span id="status-text">Verificando...</span>
+                </span>
+            </div>
+            <div class="card-body">
+                <div id="status-loading" class="loading">
+                    <div class="spinner"></div> Carregando status...
+                </div>
+                <div id="status-content" class="hidden">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
+                        <div>
+                            <span style="margin-left: 12px; color: #666; font-size: 0.9rem;" id="version-text"></span>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="font-size: 0.8rem; color: #666;">Atualizado:</div>
+                            <div id="last-update" style="font-family: monospace; font-size: 0.85rem;"></div>
+                        </div>
+                    </div>
+                    <div class="grid" id="stats-grid"></div>
+                    <div class="actions" style="margin-top: 20px;">
+                        <button class="btn btn-success" id="btn-rescan" onclick="triggerRescan()">
+                            🔄 Reescanear Mídia
+                        </button>
+                        <button class="btn btn-primary" id="btn-restart" onclick="restartMinidlna()">
+                            🔁 Reiniciar MiniDLNA
+                        </button>
+                        <button class="btn btn-secondary" onclick="location.reload()">
+                            ↻ Atualizar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- DLNA Access Info -->
+        <div class="card">
+            <div class="card-header">Acesso DLNA</div>
+            <div class="card-body">
+                <p style="margin-bottom: 12px; color: #666;">Use estas URLs nos seus dispositivos DLNA (VLC, Smart TV, etc.):</p>
+                <div class="dlna-url" id="dlna-url">Carregando...</div>
+                <p style="margin-top: 12px; font-size: 0.85rem; color: #666;">
+                    <strong>Dica:</strong> No VLC mobile/desktop: Visualizar → Lista de reprodução → Descobrir → UPnP/DLNA
+                </p>
+            </div>
+        </div>
+
+        <!-- Media Folders Management -->
+        <div class="card">
+            <div class="card-header">
+                Pastas de Mídia Compartilhadas
+                <button class="btn btn-primary" onclick="openAddFolderModal()" style="padding: 6px 14px; font-size: 0.85rem;">+ Adicionar Pasta</button>
+            </div>
+            <div class="card-body">
+                <ul class="folder-list" id="folder-list">
+                    <li class="folder-item loading"><div class="spinner" style="margin:0 auto;"></div></li>
+                </ul>
+                <p class="hint">As pastas são salvas no <code>minidlna.conf</code>. Use tipos para organizar: Áudio (A), Vídeo (V), Imagens (P) ou Mista.</p>
+            </div>
+        </div>
+
+        <!-- Config Preview -->
+        <div class="card">
+            <div class="card-header">Configuração Atual (minidlna.conf)</div>
+            <div class="card-body">
+                <pre id="config-preview" style="background: #f8f9fa; padding: 16px; border-radius: 8px; font-size: 0.8rem; max-height: 300px; overflow: auto; font-family: monospace;">Carregando...</pre>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Folder Modal -->
+    <div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
+        <div class="modal" onclick="event.stopPropagation()">
+            <h3>Adicionar Pasta de Mídia</h3>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Tipo de Mídia</label>
+                    <select id="folder-type">
+                        <option value="">Mista (todos os tipos)</option>
+                        <option value="A">🎵 Áudio</option>
+                        <option value="V">🎬 Vídeo</option>
+                        <option value="P">🖼️ Imagens</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Caminho da Pasta (dentro do container)</label>
+                    <input type="text" id="folder-path" placeholder="/media/minha-pasta" value="/media/">
+                </div>
+            </div>
+            <p class="hint">Pastas disponíveis no container: <code>/media</code> (suas pastas customizadas), <code>/media/downloads</code> (Downloads do Umbrel)</p>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
+                <button class="btn btn-primary" onclick="addFolder()">Adicionar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let rescanInProgress = false;
+        let restartInProgress = false;
+
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 4000);
+        }
+
+        async function fetchStatus() {
+            try {
+                const resp = await fetch('/api/status');
+                const data = await resp.json();
+                updateStatusUI(data);
+            } catch (e) {
+                console.error('Status fetch failed:', e);
+                document.getElementById('status-loading').innerHTML = 
+                    '<div style="color: #c5221f;">Erro ao carregar status. Verifique se o MiniDLNA está rodando.</div>';
+            }
+        }
+
+        function updateStatusUI(data) {
+            const loading = document.getElementById('status-loading');
+            const content = document.getElementById('status-content');
+            const badge = document.getElementById('status-badge');
+            const statusText = document.getElementById('status-text');
+            const versionText = document.getElementById('version-text');
+            const lastUpdate = document.getElementById('last-update');
+            const statsGrid = document.getElementById('stats-grid');
+            const dlnaUrl = document.getElementById('dlna-url');
+
+            loading.classList.add('hidden');
+            content.classList.remove('hidden');
+
+            if (data.success) {
+                badge.className = 'status-badge status-online';
+                statusText.textContent = 'Online';
+                versionText.textContent = `v${data.version}`;
+                lastUpdate.textContent = new Date().toLocaleString('pt-BR');
+
+                statsGrid.innerHTML = `
+                    <div class="stat">
+                        <div class="stat-value">${data.files.toLocaleString('pt-BR')}</div>
+                        <div class="stat-label">Total de Arquivos</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value">${data.video_files.toLocaleString('pt-BR')}</div>
+                        <div class="stat-label">Vídeos</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value">${data.audio_files.toLocaleString('pt-BR')}</div>
+                        <div class="stat-label">Músicas</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value">${data.image_files.toLocaleString('pt-BR')}</div>
+                        <div class="stat-label">Imagens</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value">${data.clients}</div>
+                        <div class="stat-label">Clientes Conectados</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value">${data.db_status}</div>
+                        <div class="stat-label">Banco de Dados</div>
+                    </div>
+                `;
+
+                const host = window.location.hostname;
+                dlnaUrl.textContent = `http://${host}:8200/`;
+            } else {
+                badge.className = 'status-badge status-offline';
+                statusText.textContent = 'Offline';
+                versionText.textContent = '';
+                lastUpdate.textContent = new Date().toLocaleString('pt-BR');
+                statsGrid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: #c5221f;">Erro: ' + (data.error || 'Desconhecido') + '</div>';
+                dlnaUrl.textContent = 'Indisponível';
+            }
+        }
+
+        async function fetchFolders() {
+            try {
+                const resp = await fetch('/api/folders');
+                const data = await resp.json();
+                updateFoldersUI(data);
+            } catch (e) {
+                console.error('Folders fetch failed:', e);
+            }
+        }
+
+        function updateFoldersUI(folders) {
+            const list = document.getElementById('folder-list');
+            if (!folders || folders.length === 0) {
+                list.innerHTML = '<li class="folder-item" style="color: #666; justify-content: center;">Nenhuma pasta configurada</li>';
+                return;
+            }
+            list.innerHTML = folders.map((f, i) => {
+                const typeLabel = f.type ? {A:'Áudio',V:'Vídeo',P:'Imagens'}[f.type] : 'Mista';
+                const typeClass = f.type ? '' : 'style="background: #f1f3f4; color: #666;"';
+                return `<li class="folder-item">
+                    <span class="folder-path">${f.path}</span>
+                    <span class="folder-type" ${typeClass}>${typeLabel}</span>
+                    <button class="btn btn-danger" onclick="removeFolder(${i})" style="padding: 6px 12px; font-size: 0.8rem;">Remover</button>
+                </li>`;
+            }).join('');
+        }
+
+        async function fetchConfig() {
+            try {
+                const resp = await fetch('/api/config');
+                const data = await resp.json();
+                document.getElementById('config-preview').textContent = data.config || 'Não disponível';
+            } catch (e) {
+                document.getElementById('config-preview').textContent = 'Erro ao carregar config';
+            }
+        }
+
+        async function triggerRescan() {
+            if (rescanInProgress) return;
+            const btn = document.getElementById('btn-rescan');
+            rescanInProgress = true;
+            btn.disabled = true;
+            btn.innerHTML = '⏳ Reescaneando...';
+
+            try {
+                const resp = await fetch('/api/rescan', { method: 'POST' });
+                const data = await resp.json();
+                if (data.success) {
+                    showToast('Rescan iniciado! O status será atualizado em alguns segundos.', 'success');
+                    setTimeout(fetchStatus, 3000);
+                } else {
+                    showToast('Erro: ' + (data.error || 'Falha ao iniciar rescan'), 'error');
+                }
+            } catch (e) {
+                showToast('Erro de rede: ' + e.message, 'error');
+            } finally {
+                rescanInProgress = false;
+                btn.disabled = false;
+                btn.innerHTML = '🔄 Reescanear Mídia';
+            }
+        }
+
+        async function restartMinidlna() {
+            if (restartInProgress) return;
+            const btn = document.getElementById('btn-restart');
+            restartInProgress = true;
+            btn.disabled = true;
+            btn.innerHTML = '⏳ Reiniciando...';
+
+            try {
+                const resp = await fetch('/api/restart', { method: 'POST' });
+                const data = await resp.json();
+                if (data.success) {
+                    showToast(data.message, 'warning');
+                    setTimeout(fetchStatus, 5000);
+                } else {
+                    showToast('Erro: ' + (data.error || 'Falha ao reiniciar'), 'error');
+                }
+            } catch (e) {
+                showToast('Erro de rede: ' + e.message, 'error');
+            } finally {
+                restartInProgress = false;
+                btn.disabled = false;
+                btn.innerHTML = '🔁 Reiniciar MiniDLNA';
+            }
+        }
+
+        function openAddFolderModal() {
+            document.getElementById('modal-overlay').classList.add('show');
+            document.getElementById('folder-path').focus();
+        }
+
+        function closeModal(event) {
+            if (!event || event.target === document.getElementById('modal-overlay')) {
+                document.getElementById('modal-overlay').classList.remove('show');
+                document.getElementById('folder-path').value = '/media/';
+                document.getElementById('folder-type').value = '';
+            }
+        }
+
+        async function addFolder() {
+            const type = document.getElementById('folder-type').value;
+            const path = document.getElementById('folder-path').value.trim();
+
+            if (!path) {
+                showToast('Informe o caminho da pasta', 'error');
+                return;
+            }
+
+            try {
+                const resp = await fetch('/api/folders', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ type, path })
+                });
+                const data = await resp.json();
+                if (data.success) {
+                    showToast('Pasta adicionada! Reescaneie para aplicar.', 'success');
+                    closeModal();
+                    fetchFolders();
+                    fetchConfig();
+                } else {
+                    showToast('Erro: ' + (data.error || 'Falha ao adicionar'), 'error');
+                }
+            } catch (e) {
+                showToast('Erro de rede: ' + e.message, 'error');
+            }
+        }
+
+        async function removeFolder(index) {
+            if (!confirm('Remover esta pasta?')) return;
+
+            try {
+                const resp = await fetch(`/api/folders/${index}`, { method: 'DELETE' });
+                const data = await resp.json();
+                if (data.success) {
+                    showToast('Pasta removida! Reescaneie para aplicar.', 'success');
+                    fetchFolders();
+                    fetchConfig();
+                } else {
+                    showToast('Erro: ' + (data.error || 'Falha ao remover'), 'error');
+                }
+            } catch (e) {
+                showToast('Erro de rede: ' + e.message, 'error');
+            }
+        }
+
+        // Initial load
+        fetchStatus();
+        fetchFolders();
+        fetchConfig();
+
+        // Auto-refresh every 30 seconds
+        setInterval(fetchStatus, 30000);
+
+        // Close modal on Escape
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeModal();
+        });
+    </script>
+</body>
+</html>
